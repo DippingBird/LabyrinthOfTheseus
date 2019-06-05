@@ -80,11 +80,10 @@ def all_acyclic_paths(graph, start_node, goal_node):
                 
 def all_distinct_cycles(graph):
     '''
-    Returns all cycles in the graph which are pairwise distinct to each other.
+    Returns all cycles in the graph which are distinct.
     
-    A cycle is distinct to another when it is not contained or 
-    a rotation of the other cycle.  The cycles always have 
-    the smallest indexed node as the starting-node.
+    A cycle is distinct if its start_node and final_node
+    have the smallest index of all visited_nodes.
     '''
     
     all_distinct_cycles = []    
@@ -129,8 +128,8 @@ def import_graph():
     Returns the graph created from the "LabyrinthEdges.csv"-file.
     
     The metadata in the csv-file is transformed from a undirected network
-    in a directed, weighted multigraph.
-    The returned graph contains 76 nodes and 166 edges.
+    in a directed, weighted multigraph.  The returned graph contains 76 
+    nodes and 166 edges.
     '''
     
     imported_graph = Graph(76)
