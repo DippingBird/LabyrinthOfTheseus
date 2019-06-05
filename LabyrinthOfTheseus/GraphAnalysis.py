@@ -78,27 +78,33 @@ def all_distinct_cycles(graph):
     The cycles always have the smallest indexed node as the starting-node.
     '''
     all_distinct_cycles = []
-    for i in range(graph.node_count):        
-        current_paths = [Path(graph, i)]
+    
+    for start_node in range(graph.node_count):        
+        current_paths = [Path(graph, start_node)]
         new_paths = []
-        all_paths_converged = False        
-        while not all_paths_converged:
-            all_paths_converged = True
+        all_paths_cycled = False        
+        while not all_paths_cycled:
+            # Check whether the graph contains any cycles
+            all_paths_cycled = any(current_paths)
             for current_path in current_paths:
-                # If the path has no edges and thus cannot be a cycle,
+                # If current_path has no edges and thus cannot be a cycle,
                 # or has not jet cycled back to the starting-node                
-                if current_path.length() == 0 or current_path.final_node() != i:
+                if current_path.length() == 0 or current_path.final_node() != start_node:
                     for following_edge in current_path.following_edges():
                         following_node = following_edge.target_node 
-                        # If the following_node is the starting-node, 
-                        # or is not contained as a starting-node in earlier graphs 
-                        # and does not create a cycle somewhere else
-                        if following_node == i or (following_node > i and following_node not in current_path.visited_nodes):
+                        # If the following_node is the start_node
+                        if (following_node == start_node or 
+                           (following_node > start_node and 
+                            following_node not in current_path.visited_nodes)):
+                            # Or is not contained as a start_node in earlier cycles and 
+                            # does not create additional cycles
                             new_path = current_path.copy()
                             new_path.add_edge(following_edge)
+                            # Add extended path to next iteration
                             new_paths.append(new_path)
-                            all_paths_converged = False
+                            all_paths_cycled = False
                 else:
+                    # Otherwise simply add cycle to the next iteration
                     new_paths.append(current_path)
             current_paths = new_paths
             new_paths = []
