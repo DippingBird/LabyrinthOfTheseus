@@ -8,27 +8,6 @@ import csv
 
 
 def main():
-    '''
-    edges = [
-        Edge(0, 1),
-        Edge(0, 3),
-        Edge(1, 2),
-        Edge(1, 2),
-        Edge(1, 3),
-        Edge(2, 0),
-        Edge(2, 3),
-        Edge(3, 0)
-        ]
-    graph = Graph(4)
-    graph.add_edges(edges)
-    print(len(all_distinct_cycles(graph)))    
-    '''    
-    graph = import_graph()
-    all_paths = all_acyclic_paths(graph, 0, 37)
-    sp = shortest_path(all_paths)
-    lp = longest_path(all_paths)
-    print(len(all_paths))
-    print(lp.visited_nodes_ordered())
     exit()
 
 
@@ -147,9 +126,11 @@ def all_distinct_cycles(graph):
 
 def import_graph():
     '''
-    Returns the graph created from the data of the labyrinth of theseus stored as a .csv file.
+    Returns the graph created from the "LabyrinthEdges.csv"-file.
     
-    Graph contains 76 nodes and 166 edges.
+    The metadata in the csv-file is transformed from a undirected network
+    in a directed, weighted multigraph.
+    The returned graph contains 76 nodes and 166 edges.
     '''
     
     imported_graph = Graph(76)
@@ -165,18 +146,15 @@ def import_graph():
             direction_1 = edge[3]
             direction_2 = edge[4]
             # add transformed edges
-            imported_graph.add_edge(_directed_edge
+            imported_graph.add_edge(_get_directed_edge
                 (node_1, node_2, weight, direction_1, direction_2))
-            imported_graph.add_edge(_directed_edge
+            imported_graph.add_edge(_get_directed_edge
                 (node_2, node_1, weight, direction_2, direction_1))
         return imported_graph
 
             
-def _directed_edge(source_node, target_node, weight, source_direction, target_direction):
-    '''
-    TODO
-    '''
-    
+def _get_directed_edge(source_node, target_node, weight, source_direction, target_direction):
+    '''Returns a directed edge according to the given undirected network.'''    
     if source_direction in {'d', 'l'}:
         source_node += 38
     if target_direction in {'u', 'r'}:
