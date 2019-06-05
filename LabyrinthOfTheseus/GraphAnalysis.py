@@ -23,14 +23,12 @@ def main():
     graph.add_edges(edges)
     print(len(all_distinct_cycles(graph)))    
     '''    
-    '''
     graph = import_graph()
     all_paths = all_acyclic_paths(graph, 0, 37)
     sp = shortest_path(all_paths)
     lp = longest_path(all_paths)
     print(len(all_paths))
-    print(lp.visited_nodes_in_order())
-    '''
+    print(lp.visited_nodes_ordered())
     exit()
 
 
@@ -167,9 +165,9 @@ def import_graph():
             direction_1 = edge[3]
             direction_2 = edge[4]
             # add transformed edges
-            imported_graph.add_edge(directed_edge
+            imported_graph.add_edge(_directed_edge
                 (node_1, node_2, weight, direction_1, direction_2))
-            imported_graph.add_edge(directed_edge
+            imported_graph.add_edge(_directed_edge
                 (node_2, node_1, weight, direction_2, direction_1))
         return imported_graph
 
@@ -208,10 +206,14 @@ class Path:
             self.add_edge(edge) 
                 
     def add_edge(self, edge):
-        self.edges.append(edge)
-        self.visited_nodes.add(edge.target_node)
-        self.total_weight += edge.weight
-    
+        # Check whether the edge is in the graph and follows the path
+        if self.graph.edge_contained(edge) and edge.source_node == self.final_node(): 
+            self.edges.append(edge)
+            self.visited_nodes.add(edge.target_node)
+            self.total_weight += edge.weight
+        else:
+            raise ValueError('Given edge not in graph or not following the path')
+        
     def length(self):
         return len(self.edges)
     
@@ -221,7 +223,7 @@ class Path:
         else:
             return self.start_node
         
-    def visited_nodes_in_order(self):
+    def visited_nodes_ordered(self):
         '''
         Returns a list of all visited nodes 
         in order of visit from start to finish.
@@ -233,8 +235,7 @@ class Path:
         return visited_nodes
     
     def following_edges(self):
-        '''Returns a list of the outgoing edges of the final_node.'''
-        
+        '''Returns a list of the outgoing edges of the final_node.'''        
         return self.graph.outgoing_edges[self.final_node()]
             
     def copy(self):
@@ -255,7 +256,7 @@ class Graph:
         self.outgoing_edges = []
         for i in range(node_count):
             self.outgoing_edges.append([])
-        self.all_edges = {}
+        self.all_edges = set()
         if edges is not None:
             self.add_edges(edges)
     
@@ -267,8 +268,8 @@ class Graph:
     def add_edge(self, edge):
         '''Adds the given edge to the graph.'''
         # Make sure that both the source_node
-        if (self.node_in_graph(edge.source_node) and 
-            self.node_in_graph(edge.target_node)):
+        if (self.node_contained(edge.source_node) and 
+            self.node_contained(edge.target_node)):
             # as well as the target_node are contained in the graph.
             self.outgoing_edges[edge.source_node].append(edge)
             self.all_edges.add(edge)
@@ -279,11 +280,11 @@ class Graph:
         '''Returns the amount of edges in the graph.'''
         return len(self.all_edges)
     
-    def node_in_graph(self, node):
+    def node_contained(self, node):
         '''Returns whether the given node is contained in the graph.'''
         return 0 <= node < self.node_count
 
-    def edge_in_graph(self, edge):
+    def edge_contained(self, edge):
         '''Returns whether the given edge is contained in the graph.'''
         return edge in self.all_edges
 
