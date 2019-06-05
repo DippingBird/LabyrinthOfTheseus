@@ -7,6 +7,33 @@ Created on 03.06.2019
 import csv
 
 
+def main():
+    '''
+    edges = [
+        Edge(0, 1),
+        Edge(0, 3),
+        Edge(1, 2),
+        Edge(1, 2),
+        Edge(1, 3),
+        Edge(2, 0),
+        Edge(2, 3),
+        Edge(3, 0)
+        ]
+    graph = Graph(4)
+    graph.add_edges(edges)
+    print(len(all_distinct_cycles(graph)))    
+    '''    
+    '''
+    graph = import_graph()
+    all_paths = all_acyclic_paths(graph, 0, 37)
+    sp = shortest_path(all_paths)
+    lp = longest_path(all_paths)
+    print(len(all_paths))
+    print(lp.visited_nodes_in_order())
+    '''
+    exit()
+
+
 def average_total_weight(paths):
     '''Returns the average total_weight over all given paths'''
     return total_weight_sum(paths) / len(paths)
@@ -228,17 +255,37 @@ class Graph:
         self.outgoing_edges = []
         for i in range(node_count):
             self.outgoing_edges.append([])
-        self.edge_count = 0
+        self.all_edges = {}
         if edges is not None:
             self.add_edges(edges)
     
     def add_edges(self, edges):
+        '''Adds the given edges to the graph.'''
         for edge in edges:
             self.add_edge(edge)
     
     def add_edge(self, edge):
-        self.outgoing_edges[edge.source_node].append(edge)
-        self.edge_count += 1
+        '''Adds the given edge to the graph.'''
+        # Make sure that both the source_node
+        if (self.node_in_graph(edge.source_node) and 
+            self.node_in_graph(edge.target_node)):
+            # as well as the target_node are contained in the graph.
+            self.outgoing_edges[edge.source_node].append(edge)
+            self.all_edges.add(edge)
+        else:
+            raise ValueError('source - or - target-node of given edge not in graph')
+        
+    def edge_count(self):
+        '''Returns the amount of edges in the graph.'''
+        return len(self.all_edges)
+    
+    def node_in_graph(self, node):
+        '''Returns whether the given node is contained in the graph.'''
+        return 0 <= node < self.node_count
+
+    def edge_in_graph(self, edge):
+        '''Returns whether the given edge is contained in the graph.'''
+        return edge in self.all_edges
 
                 
 class Edge:
@@ -251,27 +298,4 @@ class Edge:
 
         
 if __name__ == '__main__':
-    '''
-    edges = [
-        Edge(0, 1),
-        Edge(0, 3),
-        Edge(1, 2),
-        Edge(1, 2),
-        Edge(1, 3),
-        Edge(2, 0),
-        Edge(2, 3),
-        Edge(3, 0)
-        ]
-    graph = Graph(4)
-    graph.add_edges(edges)
-    print(len(all_distinct_cycles(graph)))    
-    '''    
-    '''
-    graph = import_graph()
-    all_paths = all_acyclic_paths(graph, 0, 37)
-    sp = shortest_path(all_paths)
-    lp = longest_path(all_paths)
-    print(len(all_paths))
-    print(lp.visited_nodes_in_order())
-    '''
-    exit()
+    main()
