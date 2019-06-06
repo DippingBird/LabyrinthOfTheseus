@@ -17,8 +17,7 @@ def average_total_weight(paths):
 
 
 def total_weight_sum(paths):
-    '''Returns the sum of the total_weight of all given paths'''
-    
+    '''Returns the sum of the total_weight of all given paths'''    
     total_weight_sum = 0
     for path in paths:
         total_weight_sum += path.total_weight
@@ -26,8 +25,7 @@ def total_weight_sum(paths):
 
 
 def shortest_path(paths):
-    '''Returns the path with minimal total_weight of all given paths'''
-    
+    '''Returns the path with minimal total_weight of all given paths'''    
     shortest_path = None
     for path in paths:
         if shortest_path is None or shortest_path.total_weight > path.total_weight :
@@ -36,8 +34,7 @@ def shortest_path(paths):
 
 
 def longest_path(paths):
-    '''Returns the path with maximal total_weight of all given paths'''
-    
+    '''Returns the path with maximal total_weight of all given paths'''    
     longest_path = None
     for path in paths:
         if longest_path is None or longest_path.total_weight < path.total_weight :
