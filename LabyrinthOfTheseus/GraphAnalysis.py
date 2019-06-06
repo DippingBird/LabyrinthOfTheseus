@@ -5,15 +5,32 @@ Created on 03.06.2019
 '''
 
 import csv
+import ConsoleInterface
 
 
 def main():
+    graph = import_graph()
+    all_paths = all_acyclic_paths(graph, 0, 37)
+    print(ConsoleInterface.written_paths_analysis(all_paths))
     exit()
 
 
+def average_length(paths):
+    '''Returns the average length over all given paths.'''
+    return length_sum(paths) / len(paths)
+
+
 def average_total_weight(paths):
-    '''Returns the average total_weight over all given paths'''
+    '''Returns the average total_weight over all given paths.'''
     return total_weight_sum(paths) / len(paths)
+
+
+def length_sum(paths):
+    '''Returns the sum of all lengths of the given paths.'''
+    length_sum = 0
+    for path in paths:
+        length_sum += path.length()
+    return length_sum
 
 
 def total_weight_sum(paths):
@@ -21,7 +38,7 @@ def total_weight_sum(paths):
     total_weight_sum = 0
     for path in paths:
         total_weight_sum += path.total_weight
-    return total_weight
+    return total_weight_sum 
 
 
 def shortest_path(paths):
