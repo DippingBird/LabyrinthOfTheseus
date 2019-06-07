@@ -5,6 +5,7 @@ Created on 06.06.2019
 '''
 
 import GraphAnalysis
+from typing import Collection
 
 
 def main():
@@ -36,7 +37,7 @@ Edge count : {graph.edge_count()}
 ''')
     
 
-def written_paths_analysis(paths):
+def written_paths_analysis(paths: Collection[GraphAnalysis.Path]) -> str:
     '''Returns a string containing analysis of the given paths.'''
     shortest_path = GraphAnalysis.shortest_path(paths)
     longest_path = GraphAnalysis.longest_path(paths)
@@ -62,7 +63,7 @@ Weight         : {longest_path.total_weight:.1f}
     return written_paths_analysis
 
 
-def written_path(path, max_line_length=80):
+def written_path(path: GraphAnalysis.Path, max_line_length: int=80) -> str:
     '''
     Returns a string showing the visited nodes of the given path in order
     with the corresponding edge-weights.

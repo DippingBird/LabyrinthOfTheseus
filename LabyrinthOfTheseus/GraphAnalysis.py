@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 '''
 Created on 03.06.2019
 
@@ -5,19 +7,144 @@ Created on 03.06.2019
 '''
 
 import csv
+from typing import List, Collection, Set
 
 
-def average_length(paths):
+class Edge:
+    '''A directed, weighted edge.'''    
+    source_node: int
+    target_node: int
+    weight: float
+    
+    def __init__(self, source_node: int, target_node: int, weight: float=0):
+        self.source_node = source_node
+        self.target_node = target_node
+        self.weight = weight
+            
+                
+class Graph:
+    '''
+    A directed, weighted multigraph.
+    
+    Allows multiple edges between arbitrary source - and - target-nodes, 
+    nodes are indexed from 0 upwards incrementally.
+    '''
+    node_count: int
+    outgoing_edges: List[List[Edge]]
+    all_edges: Set[Edge]
+    
+    def __init__(self, node_count: int, edges: Collection[Edge]=None):
+        self.node_count = node_count
+        self.outgoing_edges = []
+        for i in range(node_count):
+            self.outgoing_edges.append([])
+        self.all_edges = set()
+        if edges is not None:
+            self.add_edges(edges)
+    
+    def add_edges(self, edges: Collection[Edge]):
+        '''Adds the given edges to the graph.'''
+        for edge in edges:
+            self.add_edge(edge)
+    
+    def add_edge(self, edge: Edge):
+        '''Adds the given edge to the graph.'''
+        # Make sure that both the source_node
+        if (self.node_contained(edge.source_node) and 
+            self.node_contained(edge.target_node)):
+            # as well as the target_node are contained in the graph.
+            self.outgoing_edges[edge.source_node].append(edge)
+            self.all_edges.add(edge)
+        else:
+            raise ValueError('source - or - target-node of given edge not in graph')
+        
+    def edge_count(self):
+        '''Returns the amount of edges in the graph.'''
+        return len(self.all_edges)
+    
+    def node_contained(self, node: int):
+        '''Returns whether the given node is contained in the graph.'''
+        return 0 <= node < self.node_count
+
+    def edge_contained(self, edge: Edge):
+        '''Returns whether the given edge is contained in the graph.'''
+        return edge in self.all_edges
+
+                
+class Path:
+    '''A directed, weighted path'''    
+    graph: Graph
+    start_node: int
+    visited_nodes: Set[int]
+    edges: List[Edge]
+    total_weight: float    
+    
+    def __init__(self, graph: Graph, start_node: int, **kwargs):
+        self.graph = graph
+        self.start_node = start_node     
+        if ('edges' in kwargs and
+            'visited_nodes' in kwargs and 
+            'total_weight' in kwargs):
+            self.visited_nodes = kwargs['visited_nodes']
+            self.total_weight = kwargs['total_weight']
+            self.edges = kwargs['edges']
+        else:
+            self.visited_nodes = {start_node}
+            self.edges = []
+            self.total_weight = 0
+        
+    def add_edges(self, edges: Collection[Edge]):
+        for edge in edges:
+            self.add_edge(edge) 
+                
+    def add_edge(self, edge: Edge):
+        # Check whether the edge is in the graph and follows the path
+        if self.graph.edge_contained(edge) and edge.source_node == self.final_node(): 
+            self.edges.append(edge)
+            self.visited_nodes.add(edge.target_node)
+            self.total_weight += edge.weight
+        else:
+            raise ValueError('Given edge not in graph or not following the path')
+        
+    def length(self) -> int:
+        return len(self.edges)
+    
+    def final_node(self) -> int:
+        if(any(self.edges)):
+            return self.edges[-1].target_node
+        else:
+            return self.start_node
+        
+    def visited_nodes_ordered(self) -> List[int]:
+        '''
+        Returns a list of all visited nodes 
+        in order of visit from start to finish.
+        '''        
+        visited_nodes_ordered = [self.start_node]
+        for edge in self.edges:
+            visited_nodes_ordered.append(edge.target_node)
+        return visited_nodes_ordered
+    
+    def following_edges(self) -> List[Edge]:
+        '''Returns a list of the outgoing edges of the final_node.'''        
+        return self.graph.outgoing_edges[self.final_node()]
+            
+    def copy(self):
+        '''Copy of the path.'''
+        return Path(self.graph, self.start_node, edges=self.edges.copy(), visited_nodes=self.visited_nodes.copy(), total_weight=self.total_weight)
+
+
+def average_length(paths: Collection[Path]) -> float:
     '''Returns the average length over all given paths.'''
     return length_sum(paths) / len(paths)
 
 
-def average_total_weight(paths):
+def average_total_weight(paths: Collection[Path]) -> float:
     '''Returns the average total_weight over all given paths.'''
     return total_weight_sum(paths) / len(paths)
 
 
-def length_sum(paths):
+def length_sum(paths: Collection[Path]) -> int:
     '''Returns the sum of all lengths of the given paths.'''
     length_sum = 0
     for path in paths:
@@ -25,7 +152,7 @@ def length_sum(paths):
     return length_sum
 
 
-def total_weight_sum(paths):
+def total_weight_sum(paths: Collection[Path]) -> float:
     '''Returns the sum of the total_weight of all given paths'''    
     total_weight_sum = 0
     for path in paths:
@@ -33,7 +160,7 @@ def total_weight_sum(paths):
     return total_weight_sum 
 
 
-def shortest_path(paths):
+def shortest_path(paths: Collection[Path]) -> Path:
     '''Returns the path with minimal total_weight of all given paths'''    
     shortest_path = None
     for path in paths:
@@ -42,7 +169,7 @@ def shortest_path(paths):
     return shortest_path 
 
 
-def longest_path(paths):
+def longest_path(paths: Collection[Path]) -> Path:
     '''Returns the path with maximal total_weight of all given paths'''    
     longest_path = None
     for path in paths:
@@ -51,12 +178,14 @@ def longest_path(paths):
     return longest_path 
 
 
-def all_acyclic_paths(graph, start_node, goal_node):
+def all_acyclic_paths(graph: Graph, start_node: int, goal_node: int) -> List[Path]:
     '''
     Returns a set of all acyclic paths in the graph 
     leading from the start_node to the goal_node.
     '''
-    
+    # Check whether start - and - goal-node are contained in graph
+    if not (graph.node_contained(start_node) and graph.node_contained(goal_node)):
+        raise ValueError('Given start - or - goal-node not contained in given graph')
     current_paths = [Path(graph, start_node)]
     new_paths = []
     all_paths_converged = False
@@ -84,7 +213,7 @@ def all_acyclic_paths(graph, start_node, goal_node):
     return current_paths
 
                 
-def all_distinct_cycles(graph):
+def all_distinct_cycles(graph: Graph) -> List[Path]:
     '''
     Returns all cycles in the graph which are distinct.
     
@@ -129,7 +258,7 @@ def all_distinct_cycles(graph):
     return all_distinct_cycles
 
 
-def import_graph():
+def import_graph() -> Graph:
     '''
     Returns the graph created from the "LabyrinthEdges.csv"-file.
     
@@ -158,7 +287,8 @@ def import_graph():
         return imported_graph
 
             
-def _get_directed_edge(source_node, target_node, weight, source_direction, target_direction):
+def _get_directed_edge(source_node: int, target_node: int, weight: float,
+                       source_direction: str, target_direction: str):
     '''Returns a directed edge according to the given undirected network.'''    
     if source_direction in {'d', 'l'}:
         source_node += 38
@@ -166,118 +296,4 @@ def _get_directed_edge(source_node, target_node, weight, source_direction, targe
         target_node += 38
     return Edge(source_node, target_node, weight)
 
-        
-class Path:
-    '''A directed, weighted path'''    
-
-    def __init__(self, graph, start_node, **kwargs):
-        self.graph = graph
-        self.start_node = start_node     
-        if ('edges' in kwargs and
-            'visited_nodes' in kwargs and 
-            'total_weight' in kwargs):
-            self.visited_nodes = kwargs['visited_nodes']
-            self.total_weight = kwargs['total_weight']
-            self.edges = kwargs['edges']
-        else:
-            self.visited_nodes = {start_node}
-            self.edges = []
-            self.total_weight = 0
-        
-    def add_edges(self, edges):
-        for edge in edges:
-            self.add_edge(edge) 
-                
-    def add_edge(self, edge):
-        # Check whether the edge is in the graph and follows the path
-        if self.graph.edge_contained(edge) and edge.source_node == self.final_node(): 
-            self.edges.append(edge)
-            self.visited_nodes.add(edge.target_node)
-            self.total_weight += edge.weight
-        else:
-            raise ValueError('Given edge not in graph or not following the path')
-        
-    def length(self):
-        return len(self.edges)
-    
-    def final_node(self):
-        if(any(self.edges)):
-            return self.edges[-1].target_node
-        else:
-            return self.start_node
-        
-    def visited_nodes_ordered(self):
-        '''
-        Returns a list of all visited nodes 
-        in order of visit from start to finish.
-        '''
-        
-        visited_nodes = [self.start_node]
-        for edge in self.edges:
-            visited_nodes.append(edge.target_node)
-        return visited_nodes
-    
-    def following_edges(self):
-        '''Returns a list of the outgoing edges of the final_node.'''        
-        return self.graph.outgoing_edges[self.final_node()]
-            
-    def copy(self):
-        '''Copy of the path.'''
-        return Path(self.graph, self.start_node, edges=self.edges.copy(), visited_nodes=self.visited_nodes.copy(), total_weight=self.total_weight)
-
-    
-class Graph:
-    '''
-    A directed, weighted multigraph.
-    
-    Allows multiple edges between arbitrary source - and - target-nodes, 
-    nodes are indexed from 0 upwards incrementally.
-    '''
-    
-    def __init__(self, node_count, edges=None):
-        self.node_count = node_count
-        self.outgoing_edges = []
-        for i in range(node_count):
-            self.outgoing_edges.append([])
-        self.all_edges = set()
-        if edges is not None:
-            self.add_edges(edges)
-    
-    def add_edges(self, edges):
-        '''Adds the given edges to the graph.'''
-        for edge in edges:
-            self.add_edge(edge)
-    
-    def add_edge(self, edge: Edge):
-        '''Adds the given edge to the graph.'''
-        # Make sure that both the source_node
-        if (self.node_contained(edge.source_node) and 
-            self.node_contained(edge.target_node)):
-            # as well as the target_node are contained in the graph.
-            self.outgoing_edges[edge.source_node].append(edge)
-            self.all_edges.add(edge)
-        else:
-            raise ValueError('source - or - target-node of given edge not in graph')
-        
-    def edge_count(self):
-        '''Returns the amount of edges in the graph.'''
-        return len(self.all_edges)
-    
-    def node_contained(self, node):
-        '''Returns whether the given node is contained in the graph.'''
-        return 0 <= node < self.node_count
-
-    def edge_contained(self, edge):
-        '''Returns whether the given edge is contained in the graph.'''
-        return edge in self.all_edges
-
-                
-class Edge:
-    '''A directed, weighted edge.'''
-    
-    def __init__(self, source_node, target_node, weight=0):
-        self.source_node = source_node
-        self.target_node = target_node
-        self.weight = weight
-        
         
