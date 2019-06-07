@@ -248,7 +248,7 @@ class Graph:
         for edge in edges:
             self.add_edge(edge)
     
-    def add_edge(self, edge):
+    def add_edge(self, edge: Edge):
         '''Adds the given edge to the graph.'''
         # Make sure that both the source_node
         if (self.node_contained(edge.source_node) and 
