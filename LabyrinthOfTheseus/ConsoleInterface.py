@@ -6,6 +6,7 @@ Created on 06.06.2019
 
 import GraphAnalysis
 
+
 def main():
     display_labyrinth_graph_analysis()
     exit()
