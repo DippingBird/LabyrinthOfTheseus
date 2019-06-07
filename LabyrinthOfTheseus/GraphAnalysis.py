@@ -5,14 +5,6 @@ Created on 03.06.2019
 '''
 
 import csv
-import ConsoleInterface
-
-
-def main():
-    graph = import_graph()
-    all_paths = all_acyclic_paths(graph, 0, 37)
-    print(ConsoleInterface.written_paths_analysis(all_paths))
-    exit()
 
 
 def average_length(paths):
@@ -287,7 +279,5 @@ class Edge:
         self.source_node = source_node
         self.target_node = target_node
         self.weight = weight
-
         
-if __name__ == '__main__':
-    main()
+        

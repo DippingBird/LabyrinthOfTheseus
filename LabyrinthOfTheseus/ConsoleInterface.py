@@ -6,6 +6,34 @@ Created on 06.06.2019
 
 import GraphAnalysis
 
+def main():
+    display_labyrinth_graph_analysis()
+    exit()
+
+
+def display_labyrinth_graph_analysis():
+    '''
+    Displays the analysis of the Labyrinth of Theseus
+    as a graph in the console.
+    '''
+    graph = GraphAnalysis.import_graph()
+    # All acyclic paths from the entry to the exit of the labyrinth
+    print('Analysing graph ...')
+    acyclic_paths = GraphAnalysis.all_acyclic_paths(graph, 0, 37)
+    cyclic_paths = GraphAnalysis.all_distinct_cycles(graph)
+    print('Done!')
+    print(f'''
+----------Labyrinth of Theseus graph analysis----------
+
+Node count : {graph.node_count}
+Edge count : {graph.edge_count()}
+
+-----------Acyclic paths from entry to exit------------
+{written_paths_analysis(acyclic_paths)}
+-------------------Distinct cycles---------------------
+{written_paths_analysis(cyclic_paths)}
+''')
+    
 
 def written_paths_analysis(paths):
     '''Returns a string containing analysis of the given paths.'''
@@ -14,7 +42,7 @@ def written_paths_analysis(paths):
     written_paths_analysis = f'''    
 ----------General Paths----------
     
-Count          : {len(paths)}
+Path count     : {len(paths)}
 Average length : {GraphAnalysis.average_length(paths):.3f}
 Average weight : {GraphAnalysis.average_total_weight(paths):.3f}
 
@@ -33,27 +61,30 @@ Weight         : {longest_path.total_weight:.1f}
     return written_paths_analysis
 
 
-def written_path(path, line_length=60):
+def written_path(path, max_line_length=80):
     '''
     Returns a string showing the visited nodes of the given path in order
     with the corresponding edge-weights.
     '''
-    line_count = 1
+    # Make sure that at least two nodes with on edge
+    # fit in one line.
+    if(max_line_length <= 16):
+        raise ValueError('Given maximal line-length is to short')
+    char_count = 0
     written_path = f'({path.start_node})'
     for edge in path.edges:
-        written_path += f'-[{edge.weight:.1f}]->'
+        next_node = f'-[{edge.weight:.1f}]->({edge.target_node})'
         # If the current line is longer than the given line-length,
         # cut it off
-        if(line_count*line_length < len(written_path)):
-            written_path += '\n'
-            line_count += 1
-        written_path +=f'({edge.target_node})'
+        if(max_line_length <= (len(written_path)-char_count)+len(next_node)):
+            # Account for line-break character
+            char_count = len(written_path) + 1
+            written_path += f'\n({edge.source_node})'
+        written_path += next_node
     return written_path
 
 
-def written_path_nodes(path):
-    '''Returns a string showing the visited nodes of the given path in order.'''
-    written_path_nodes=''
-    for visited_node in path.visited_nodes_ordered():
-        written_path_nodes += f'({visited_node})->'
-    return written_path_nodes[0:-2]
+if __name__ == '__main__':
+    main()
+    
+    
