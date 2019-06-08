@@ -129,7 +129,7 @@ class Path:
         '''Returns a list of the outgoing edges of the final_node.'''        
         return self.graph.outgoing_edges[self.final_node()]
             
-    def copy(self):
+    def copy(self) -> Path:
         '''Copy of the path.'''
         return Path(self.graph, self.start_node, edges=self.edges.copy(), visited_nodes=self.visited_nodes.copy(), total_weight=self.total_weight)
 
