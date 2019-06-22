@@ -33,11 +33,14 @@ My approach was converting the labyrinth into a graph and applying [Dijkstra's a
 However i found quite the opposite, that there were 8256 acyclic paths, more than 13-times the amount that Markus found! After a lot of pondering and double-checking i believe my awnser is the correct one, however i cant be absolutely sure, a third person solving the problem through programing would certainly help deciding which the correct awnser is.
 ### Mathematical Analysis
 In order to convert the labyrinth into a graph i placed a node into transit from one romm in another, as well from the start in the first room and from the last room to the goal. Edges are added between nodes respecting the rule of always turning right or left, and the weight being the length assuming the same units as Hemme.
+
 However each node has two states, for nodes connecting horizontal adjacent rooms entering from the left or right, and for vertical adjacent rooms entering from up or down. Thus each node actually represents two nodes in an ordinary directed weighted graph, but since these two nodes are highly symmetrical they can often be treated just as one.
+
 Since the puzzle is only concerned with paths from the start to the finish one can simplify the graph by deleting nodes which have only outgoing or ingoing edge, resulting in the folowing graph.
 
 ![Image of the labyrinth graph](/LabyrinthOfTheseus/resources/graph.png)
 > Transformed image using the work of Heinrich Hemme
 
 The nodes are arbitrary indexed in a raster-fashion from the bottom upwards and left-to-right. One can easily see that this simplification does not alter the amount of paths between the start-and-goal nodes nor the amount of cycles in the graph, since no choice is made when entering or leaving such nodes.
+
 The last step is converting the presented graph into a proper directed weighted graph, TODO
