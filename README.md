@@ -1,10 +1,14 @@
 # The Labyrinth of Theseus
 A hobby project analysing a puzzle about the labyrinth of theseus by David Well republished by Heinrich Hemme on [spektrum.de](https://www.spektrum.de/).
+
+---
 ## Table of Contents
 1. **Motivation**
 2. **Graph Generation**
 3. **Algorithms**
-4. **License**
+4. **Usage**
+5. **License**
+---
 ## Motivation
 The idea to make this project began with the solving of the current puzzle from the column "[Mathematische Rätsel](https://www.spektrum.de/raetsel/)" titled "[Hemmes mathematische Rätsel: Das Labyrinth](https://www.spektrum.de/raetsel/das-labyrinth/1577642)" written by Heinrich Hemme and published online by the "[Spektrum der Wissenschaft Verlagsgesellschaft mbH](https://www.spektrumverlag.de/impressum/)" on the 25th October of 2018, a german version of the [Scientific American](https://www.scientificamerican.com/). Hemmes short summary of the puzzle translated into englisch:
 
@@ -18,12 +22,10 @@ The idea to make this project began with the solving of the current puzzle from 
 ![Image of the labyrinth](/LabyrinthOfTheseus/resources/labyrinth.png)
 All rights reserved to Heinrich Hemme
 
-
 Hemme showed that the shortest path Theseus could take is 30 units long assuming that a small quadratic room has a sidelength of 1 unit. He also mentioned that Markus Götz from Maihingen analyzed the problem 1998 and found that there were a total of 624 acyclic paths for Theseus to take.
 
 ![Image of shortest path in labyrinth](/LabyrinthOfTheseus/resources/shortestPath.png)
 All rights reserved to Heinrich Hemme
-
 
 My approach was converting the labyrinth into a graph and applying [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) in order to find the shortest path. A few months passed until i wanted to learn how to program in [Python](https://en.wikipedia.org/wiki/Python_(programming_language)) after learning C# and Java. I figured writing a program analysing this puzzle as a graph would be a good first challenge, hopefully finding the same amount of acyclic paths that Markus found.
 
@@ -37,7 +39,6 @@ Since the puzzle is only concerned with paths from the start to the finish one c
 
 ![Image of the labyrinth graph](/LabyrinthOfTheseus/resources/graph.png)
 Transformed image using the work of Heinrich Hemme
-
 
 The nodes are arbitrary indexed in a raster-fashion from the bottom upwards and left-to-right. One can easily see that this simplification does not alter the amount of paths between the start-and-goal nodes nor the amount of cycles in the graph, since no choice is made when entering or leaving such nodes.
 
@@ -80,7 +81,7 @@ By default node1 is allready the smaller and node2 the bigger indexed node.
 ## Algorithms
 The project implements twomain  algorithms for analysing the graph. One returning the set of all acyclic paths from a given start-node to a given goal-node, and another returning the set of all distinct cycles. A cycle is called distinct in this context if it doesnt contain another cycle and its start-node is unique, which is archieved by always choosing the smallest indexed node as the start-node.
 
-Since the graph can have multiple edges bewtween two nodes it is a so called multigraph, and prevents the implementation of a weight-function with the source-and-target-node as inputs. A simplified but logically identical Python-Code is shown as follows, in the actual project these algorithms are implemented  as iterative not recursive ones to increase efficiency. One can further increase efficiency by using Hash-Sets to implement Path.visited_nodes, in order to check for containement in O(1) instead of O(n). A full implementation of the Graph, Edge or Path classes is not given.
+Since the graph can have multiple edges bewtween two nodes it is a so called multigraph, and prevents the implementation of a weight-function with the source-and-target-node as inputs. A simplified but logically identical Python-Code is shown as follows, in the actual project these algorithms are implemented  as iterative not recursive ones to increase efficiency. One can further increase efficiency by using Hash-Sets to implement Path.visited_nodes, in order to check for containement in O(1) instead of O(n). A full implementation of the Graph, Edge or Path class is not given.
 
 ```python
 
@@ -90,6 +91,10 @@ class Edge:
    target_node: int
    weight: float
 
+class Grapg:
+'''A directed, weighted multigraph.'''
+   # Nodes are indexed from 0 to node_count-1 incremental
+   node_count: int
 
 class Path:
    # The node where the path starts
@@ -100,6 +105,9 @@ class Path:
    visited_nodes: Collection[int]
    # Set of all outgoing edges from the finish-node
    following_edges: Collection[Edge]
+   
+   __init__(self, start_node):
+      self.start_node = start_node
   
    add_edge(self, edge: Edge):
    '''Adds the edge to the path if it is a following edge.'''
@@ -112,14 +120,14 @@ class Path:
       
 # Initialize the current_path parameter only containing the start-node
 # and all_paths as an empty collection
-GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths: Collection[Path]) -> Collection[Path]:
+GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths=[]: Collection[Path], ignore_nodes=0: int) -> Collection[Path]:
 '''Returns a list of all acyclic paths leading from the given path to the goal-node.'''
-   # If hte path hasnt reached the goal yet
+   # If the path hasnt reached the goal yet
    if current_path.finish_node is not goal_node:
       # For all edges continuing the path
       for edge in path.following_edges:
          # which dont cause cycles
-         if edge.target_node not in path.visited_nodes:
+         if edge.target_node not in path.visited_nodes and edge.target_node >= ignore_nodes:
             # Recursively use method on the new path extended by the following edge
             new_path = current_path.copy()
             new_path.add_egde(edge)
@@ -128,4 +136,17 @@ GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths: Collection[Pat
       # If the path has reached the goal add it to the list of all acyclic paths
       all_paths.add(current_path)
    return all_paths
+
+#TODO
+GetAllDistinctCycles(graph: Graph) -> Collection[Path]:
+'''Returns a list of all distinct cycles in the given graph.'''
+   all_cycles = []: List[Path]
+   for i in range(0, graph.node_count):
+      all_cycles.extend(GetAllAcyclicPaths(Path(i), i,  [], i)
+   return all_cycles 
+
 ```
+
+Shortest and longest paths are found via linear search, as well as other data for example the arithmetic average of the length of all distinct cycles.
+
+## Usage
