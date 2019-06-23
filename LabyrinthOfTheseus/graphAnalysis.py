@@ -268,7 +268,7 @@ def import_graph() -> Graph:
     '''
     
     imported_graph = Graph(76)
-    with open ('LabyrinthEdges.csv') as csvfile:
+    with open ('resources/LabyrinthEdges.csv') as csvfile:
         edges = csv.reader(csvfile)
         edges_iter = iter(edges)
         next(edges_iter, None)
@@ -296,4 +296,3 @@ def _get_directed_edge(source_node: int, target_node: int, weight: float,
         target_node += 38
     return Edge(source_node, target_node, weight)
 
-        
