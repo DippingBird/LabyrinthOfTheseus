@@ -77,15 +77,15 @@ def written_path(path: graphAnalysis.Path, max_line_length: int=80) -> str:
     if(max_line_length <= 16):
         raise ValueError('Given maximal line-length is to short')
     char_count = 0
-    written_path = f'({path.start_node})'
+    written_path = f'({path.start_node%38})'
     for edge in path.edges:
-        next_node = f'-[{edge.weight:.1f}]->({edge.target_node})'
+        next_node = f'-[{edge.weight:.1f}]->({edge.target_node%38})'
         # If the current line is longer than the given line-length,
         # cut it off
         if(max_line_length <= (len(written_path)-char_count)+len(next_node)):
             # Account for line-break character
             char_count = len(written_path) + 1
-            written_path += f'\n({edge.source_node})'
+            written_path += f'\n({edge.source_node%38})'
         written_path += next_node
     return written_path
 
