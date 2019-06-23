@@ -18,10 +18,12 @@ The idea to make this project began with the solving of the current puzzle from 
 ![Image of the labyrinth](/LabyrinthOfTheseus/resources/labyrinth.png)
 All rights reserved to Heinrich Hemme
 
+
 Hemme showed that the shortest path Theseus could take is 30 units long assuming that a small quadratic room has a sidelength of 1 unit. He also mentioned that Markus Götz from Maihingen analyzed the problem 1998 and found that there were a total of 624 acyclic paths for Theseus to take.
 
 ![Image of shortest path in labyrinth](/LabyrinthOfTheseus/resources/shortestPath.png)
 All rights reserved to Heinrich Hemme
+
 
 My approach was converting the labyrinth into a graph and applying [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) in order to find the shortest path. A few months passed until i wanted to learn how to program in [Python](https://en.wikipedia.org/wiki/Python_(programming_language)) after learning C# and Java. I figured writing a program analysing this puzzle as a graph would be a good first challenge, hopefully finding the same amount of acyclic paths that Markus found.
 
@@ -35,6 +37,7 @@ Since the puzzle is only concerned with paths from the start to the finish one c
 
 ![Image of the labyrinth graph](/LabyrinthOfTheseus/resources/graph.png)
 Transformed image using the work of Heinrich Hemme
+
 
 The nodes are arbitrary indexed in a raster-fashion from the bottom upwards and left-to-right. One can easily see that this simplification does not alter the amount of paths between the start-and-goal nodes nor the amount of cycles in the graph, since no choice is made when entering or leaving such nodes.
 
@@ -75,3 +78,54 @@ IsLesserThan(edge1, edge2):
 
 By default node1 is allready the smaller and node2 the bigger indexed node.
 ## Algorithms
+The project implements twomain  algorithms for analysing the graph. One returning the set of all acyclic paths from a given start-node to a given goal-node, and another returning the set of all distinct cycles. A cycle is called distinct in this context if it doesnt contain another cycle and its start-node is unique, which is archieved by always choosing the smallest indexed node as the start-node.
+
+Since the graph can have multiple edges bewtween two nodes it is a so called multigraph, and prevents the implementation of a weight-function with the source-and-target-node as inputs. A simplified but logically identical Python-Code is shown as follows, in the actual project these algorithms are implemented  as iterative not recursive ones to increase efficiency. One can further increase efficiency by using Hash-Sets to implement Path.visited_nodes, in order to check for containement in O(1) instead of O(n). A full implementation of the Graph, Edge or Path classes is not given.
+
+```python
+
+class Edge:
+'''A directed, weighted edge.''' 
+   source_node: int
+   target_node: int
+   weight: float
+
+
+class Path:
+   # The node where the path starts
+   start_node: int
+   # The node where the path ends
+   finish_node: int
+   # Set of all nodes which are visited on the path
+   visited_nodes: Collection[int]
+   # Set of all outgoing edges from the finish-node
+   following_edges: Collection[Edge]
+  
+   add_edge(self, edge: Edge):
+   '''Adds the edge to the path if it is a following edge.'''
+      pass
+   
+   copy(self) -> Path:
+   '''Returns a shallow copy of the path.'''
+      pass
+      
+      
+# Initialize the current_path parameter only containing the start-node
+# and all_paths as an empty collection
+GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths: Collection[Path]) -> Collection[Path]:
+'''Returns a list of all acyclic paths leading from the given path to the goal-node.'''
+   # If hte path hasnt reached the goal yet
+   if current_path.finish_node is not goal_node:
+      # For all edges continuing the path
+      for edge in path.following_edges:
+         # which dont cause cycles
+         if edge.target_node not in path.visited_nodes:
+            # Recursively use method on the new path extended by the following edge
+            new_path = current_path.copy()
+            new_path.add_egde(edge)
+            paths.extend(GetAllAcyclicPaths(goal_node, new_path, all_paths)   
+   else:
+      # If the path has reached the goal add it to the list of all acyclic paths
+      all_paths.add(current_path)
+   return all_paths
+```
