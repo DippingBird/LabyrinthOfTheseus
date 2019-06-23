@@ -79,7 +79,7 @@ IsLesserThan(edge1, edge2):
 
 By default node1 is allready the smaller and node2 the bigger indexed node.
 ## Algorithms
-The project implements twomain  algorithms for analysing the graph. One returning the set of all acyclic paths from a given start-node to a given goal-node, and another returning the set of all distinct cycles. A cycle is called distinct in this context if it doesnt contain another cycle and its start-node is unique, which is archieved by always choosing the smallest indexed node as the start-node.
+The project implements two main  algorithms for analysing the graph. One returning the set of all acyclic paths from a given start-node to a given goal-node, and another returning the set of all distinct cycles. A cycle is called distinct in this context if it doesnt contain another cycle and its start-node is unique, which is archieved by always choosing the smallest indexed node as the start-node.
 
 Since the graph can have multiple edges bewtween two nodes it is a so called multigraph, and prevents the implementation of a weight-function with the source-and-target-node as inputs. A simplified but logically identical Python-Code is shown as follows, in the actual project these algorithms are implemented  as iterative not recursive ones to increase efficiency. One can further increase efficiency by using Hash-Sets to implement Path.visited_nodes, in order to check for containement in O(1) instead of O(n). A full implementation of the Graph, Edge or Path class is not given.
 
@@ -91,10 +91,11 @@ class Edge:
    target_node: int
    weight: float
 
-class Grapg:
+class Graph:
 '''A directed, weighted multigraph.'''
    # Nodes are indexed from 0 to node_count-1 incremental
    node_count: int
+
 
 class Path:
    # The node where the path starts
@@ -137,16 +138,27 @@ GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths=[]: Collection[
       all_paths.add(current_path)
    return all_paths
 
-#TODO
+
 GetAllDistinctCycles(graph: Graph) -> Collection[Path]:
 '''Returns a list of all distinct cycles in the given graph.'''
    all_cycles = []: List[Path]
    for i in range(0, graph.node_count):
       all_cycles.extend(GetAllAcyclicPaths(Path(i), i,  [], i)
-   return all_cycles 
-
+   return all_cycles
+   
 ```
 
-Shortest and longest paths are found via linear search, as well as other data for example the arithmetic average of the length of all distinct cycles.
+Shortest and longest paths are found via linear search, as well as other data for example the arithmetic average of the length of all distinct cycles. This leads among other things to the following result, the longest acyclic path:
+
+![Longest path](/LabyrinthOfTheseus/resources/longestPath.png)
+Transformed image using the work of Heinrich Hemme
 
 ## Usage
+
+By running the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) the graph is analysed and the results are returned as a console log as follows:
+
+> TODO
+
+This task takes approximatly XX seconds on my Intel XX processor running Windows 10. All the algorithms in the module [graphAnalysis](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
+
+## License
