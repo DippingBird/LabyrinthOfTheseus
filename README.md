@@ -79,12 +79,12 @@ IsLesserThan(edge1, edge2):
 
 By default node1 is allready the smaller and node2 the bigger indexed node.
 ## Algorithms
-The project implements two main  algorithms for analysing the graph. One returning the set of all acyclic paths from a given start-node to a given goal-node, and another returning the set of all distinct cycles. A cycle is called distinct in this context if it does not contain another cycle and its start-node is unique, which is archieved by always choosing the smallest indexed node as the start-node.
+The project implements two main  algorithms for analysing the graph. One returning the set of all acyclic paths from a given start-node to a given goal-node, and another returning the set of all distinct cycles. A cycle is called distinct in this context if it does not contain another cycle and its start-node is unique, which is archieved by always choosing the smallest indexed node as the start-node (in the following example it is the maximal indexed node).
 
-Since the graph can have multiple edges bewtween two nodes it is a so called multigraph, and this prevents the implementation of a weight-function with the source-and-target-node as inputs. A simplified but logical identical Python-Code is shown as follows, in the actual project these algorithms are implemented  as iterative not recursive ones to increase efficiency. One can further increase efficiency by using Hash-Sets to implement Path.visited_nodes, in order to check for containement in O(1) instead of O(n). One could also when finding all distinct cycles simply delete the edges and nodes that are not needed anymore to avoid uneccesary edge-checking, however this was not done in this project because it increases the complexity of the graph-class. A full implementation of the Graph, Edge or Path class is not given.
+Since the graph can have multiple edges bewtween two nodes it is a so called multigraph, and this prevents the implementation of a weight-function with the source-and-target-node as inputs. A simplified but logical identical Python-Code is shown as follows, in the actual project these algorithms are implemented  as iterative not recursive ones to increase efficiency. One can further increase efficiency by using Hash-Sets to implement Path.visited_nodes, in order to check for containement in O(1) instead of O(n). One could also when finding all distinct cycles simply delete the edges and nodes that are not needed anymore to avoid uneccesary edge-checking, however this was not done in this project because it increases the complexity of the graph-class, the "deleted" nodes are simply ignored. A full implementation of the Graph, Edge or Path class is not given.
+
 
 ```python
-
 class Edge:
 '''A directed, weighted edge.''' 
    source_node: int
@@ -95,6 +95,17 @@ class Graph:
 '''A directed, weighted multigraph.'''
    # Nodes are indexed from 0 to node_count-1 incremental
    node_count: int
+   
+   delete_maximal_node(self):
+      '''
+      Deletes the highest indexed node from the graph as well as 
+      all in-and-outleading edges.
+      '''
+      pass
+      
+   copy(self):
+      '''Returns a copy of the path with all attributes being a shallow copy.'''
+      pass
 
 
 class Path:
@@ -110,8 +121,9 @@ class Path:
    # Set of all outgoing edges from the finish-node
    following_edges: Collection[Edge]
    
-   __init__(self, start_node):
+   __init__(self, graph: Graph, start_node: int):
       self.start_node = start_node
+      self.graph = graph
   
    add_edge(self, edge: Edge):
    '''Adds the edge to the path if it is a following edge.'''
@@ -124,15 +136,14 @@ class Path:
       
 # Initialize the current_path parameter only containing the start-node
 # and all_paths as an empty collection.
-GetAllAcyclicPaths(current_path: Path, goal_node: int, 
-   all_paths=[]: Collection[Path], ignore_nodes=0: int) -> Collection[Path]:
+GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths=[]: Collection[Path]):
 '''Returns a list of all acyclic paths leading from the given path to the goal-node.'''
    # If the path has not reached the goal yet
    if current_path.finish_node is not goal_node:
       # For all edges continuing the path
       for edge in path.following_edges:
          # which dont cause cycles
-         if edge.target_node not in path.visited_nodes and edge.target_node >= ignore_nodes:
+         if edge.target_node not in path.visited_nodes:
             # Recursively use method on the new path extended by the following edge
             new_path = current_path.copy()
             new_path.add_egde(edge)
@@ -143,12 +154,14 @@ GetAllAcyclicPaths(current_path: Path, goal_node: int,
    return all_paths
 
 
-GetAllDistinctCycles(graph: Graph) -> Collection[Path]:
+GetAllDistinctCycles(graph: Graph):
 '''Returns a list of all distinct cycles in the given graph.'''
+   reduced_graph = graph.copy()
    all_cycles = []: List[Path]
-   # For all possible minimal start-nodes
-   for i in range(graph.node_count):   
-      all_cycles.extend(GetAllAcyclicPaths(Path(i), i,  [], i)
+   # For all possible maximal indexed start-nodes
+   for i in range(graph.node_count-1, -1, -1):
+      all_cycles.extend(GetAllAcyclicPaths(Path(reduced_graph, i), i))
+      reduced_graph.delete_maximal_node()
    return all_cycles 
 ```
 
@@ -161,78 +174,80 @@ Image using the transformed work of Heinrich Hemme
 
 By running the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) the graph is analysed and the results should returned as a console log similar as follows:
 
-> Building graph ...
-> Done!
-> Analysing graph ...
-> Done!
-> 
-> ----------Labyrinth of Theseus graph analysis----------
-> 
-> Node count : 76
-> Edge count : 166
-> 
-> -----------Acyclic paths from entry to exit------------
->      
-> ----------General Paths----------
->     
-> Path count     : 8256
-> Average length : 35.047
-> Average weight : 70.516
-> 
-> ----------Shortest Path----------
-> 
-> Length         : 14
-> Weight         : 30.0
-> 
-> (0)-[2.0]->(2)-[1.0]->(4)-[2.0]->(9)-[2.0]->(15)-[2.5]->(10)-[2.5]->(6)
-> (6)-[4.0]->(8)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)-[2.5]->(20)-[2.5]->(27)
-> (27)-[1.0]->(33)-[2.0]->(37)
-> 
-> ----------Longest Path-----------
-> 
-> Length         : 51
-> Weight         : 104.0
-> 
-> (0)-[2.0]->(2)-[1.0]->(4)-[1.0]->(1)-[3.5]->(7)-[1.5]->(9)-[1.5]->(13)
-> (13)-[2.5]->(17)-[2.5]->(20)-[2.5]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)
-> (14)-[3.5]->(12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)
-> (17)-[2.5]->(13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)-[1.0]->(4)-[1.0]->(2)
-> (2)-[2.0]->(3)-[1.0]->(5)-[2.5]->(10)-[2.5]->(6)-[4.0]->(8)-[1.5]->(12)
-> (12)-[3.5]->(14)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)-[2.5]->(20)-[2.5]->(26)
-> (26)-[3.0]->(32)-[1.0]->(27)-[1.0]->(33)-[2.0]->(34)-[1.0]->(29)-[1.0]->(24)
-> (24)-[1.5]->(22)-[1.5]->(19)-[3.5]->(23)-[1.5]->(25)-[1.0]->(31)-[3.0]->(36)
-> (36)-[1.0]->(30)-[1.0]->(35)-[2.0]->(37)    
-> 
-> -------------------Distinct cycles---------------------
->     
-> ----------General Paths----------
->     
-> Path count     : 3538
-> Average length : 24.910
-> Average weight : 54.987
-> 
-> 
-> ----------Shortest Path----------
-> 
-> Length         : 3
-> Weight         : 4.0
-> 
-> (1)-[1.0]->(4)-[1.0]->(2)-[2.0]->(1)
-> 
-> ----------Longest Path-----------
-> 
-> Length         : 39
-> Weight         : 85.0
-> 
-> (1)-[1.0]->(4)-[1.0]->(2)-[2.0]->(3)-[1.0]->(5)-[2.5]->(10)-[2.5]->(6)
-> (6)-[4.0]->(8)-[1.5]->(12)-[3.5]->(14)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)
-> (18)-[2.5]->(20)-[2.5]->(27)-[1.0]->(33)-[2.0]->(32)-[1.0]->(26)-[4.0]->(17)
-> (17)-[2.5]->(13)-[3.0]->(7)-[1.5]->(1)-[2.0]->(2)-[1.0]->(4)-[2.0]->(9)
-> (9)-[2.0]->(15)-[2.0]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)-[3.5]->(12)
-> (12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)-[2.5]->(13)
-> (13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)
-> 
-> Time passed:  132.64 seconds
+```
+Building graph ...
+Done!
+Analysing graph ...
+Done!
+
+----------Labyrinth of Theseus graph analysis----------
+
+Node count : 76
+Edge count : 166
+
+-----------Acyclic paths from entry to exit------------
+     
+----------General Paths----------
+    
+Path count     : 8256
+Average length : 35.047
+Average weight : 70.516
+
+----------Shortest Path----------
+
+Length         : 14
+Weight         : 30.0
+
+(0)-[2.0]->(2)-[1.0]->(4)-[2.0]->(9)-[2.0]->(15)-[2.5]->(10)-[2.5]->(6)
+(6)-[4.0]->(8)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)-[2.5]->(20)-[2.5]->(27)
+(27)-[1.0]->(33)-[2.0]->(37)
+
+----------Longest Path-----------
+
+Length         : 51
+Weight         : 104.0
+
+(0)-[2.0]->(2)-[1.0]->(4)-[1.0]->(1)-[3.5]->(7)-[1.5]->(9)-[1.5]->(13)
+(13)-[2.5]->(17)-[2.5]->(20)-[2.5]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)
+(14)-[3.5]->(12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)
+(17)-[2.5]->(13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)-[1.0]->(4)-[1.0]->(2)
+(2)-[2.0]->(3)-[1.0]->(5)-[2.5]->(10)-[2.5]->(6)-[4.0]->(8)-[1.5]->(12)
+(12)-[3.5]->(14)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)-[2.5]->(20)-[2.5]->(26)
+(26)-[3.0]->(32)-[1.0]->(27)-[1.0]->(33)-[2.0]->(34)-[1.0]->(29)-[1.0]->(24)
+(24)-[1.5]->(22)-[1.5]->(19)-[3.5]->(23)-[1.5]->(25)-[1.0]->(31)-[3.0]->(36)
+(36)-[1.0]->(30)-[1.0]->(35)-[2.0]->(37)    
+
+-------------------Distinct cycles---------------------
+    
+----------General Paths----------
+    
+Path count     : 3538
+Average length : 24.910
+Average weight : 54.987
+
+
+----------Shortest Path----------
+
+Length         : 3
+Weight         : 4.0
+
+(1)-[1.0]->(4)-[1.0]->(2)-[2.0]->(1)
+
+----------Longest Path-----------
+ 
+Length         : 39
+Weight         : 85.0
+
+(1)-[1.0]->(4)-[1.0]->(2)-[2.0]->(3)-[1.0]->(5)-[2.5]->(10)-[2.5]->(6)
+(6)-[4.0]->(8)-[1.5]->(12)-[3.5]->(14)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)
+(18)-[2.5]->(20)-[2.5]->(27)-[1.0]->(33)-[2.0]->(32)-[1.0]->(26)-[4.0]->(17)
+(17)-[2.5]->(13)-[3.0]->(7)-[1.5]->(1)-[2.0]->(2)-[1.0]->(4)-[2.0]->(9)
+(9)-[2.0]->(15)-[2.0]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)-[3.5]->(12)
+(12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)-[2.5]->(13)
+(13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)
+
+Time passed:  132.64 seconds
+```
 
 This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [graphAnalysis](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
 
