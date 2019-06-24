@@ -1,7 +1,10 @@
 '''
-Created on 06.06.2019
+Created on 24.06.2019
 
 @author: Thomas Siegmund Heidenreich
+@copyright: MIT license
+@summary: Contains Methods to present the results of the graph analysis
+in the console.
 '''
 
 import graphAnalysis

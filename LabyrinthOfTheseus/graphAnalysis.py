@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 '''
-Created on 03.06.2019
+Created on 24.06.2019
 
 @author: Thomas Siegmund Heidenreich
+@copyright: MIT license
+@summary: Defines the data structure of an directed, weighed multigraph
+as well as multiple algorithms for analysis.
 '''
 
 import csv
