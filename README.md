@@ -123,7 +123,7 @@ class Path:
 # and all_paths as an empty collection
 GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths=[]: Collection[Path], ignore_nodes=0: int) -> Collection[Path]:
 '''Returns a list of all acyclic paths leading from the given path to the goal-node.'''
-   # If the path hasnt reached the goal yet
+   # If the path has not reached the goal yet
    if current_path.finish_node is not goal_node:
       # For all edges continuing the path
       for edge in path.following_edges:
@@ -157,8 +157,78 @@ Transformed image using the work of Heinrich Hemme
 
 By running the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) the graph is analysed and the results are returned as a console log as follows:
 
-> TODO
+> Building graph ...
+Done!
+Analysing graph ...
+Done!
 
-This task takes approximatly XX seconds on my Intel XX processor running Windows 10. All the algorithms in the module [graphAnalysis](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
+----------Labyrinth of Theseus graph analysis----------
+
+Node count : 76
+Edge count : 166
+
+-----------Acyclic paths from entry to exit------------
+    
+----------General Paths----------
+    
+Path count     : 8256
+Average length : 35.047
+Average weight : 70.516
+
+----------Shortest Path----------
+
+Length         : 14
+Weight         : 30.0
+
+(0)-[2.0]->(2)-[1.0]->(4)-[2.0]->(9)-[2.0]->(15)-[2.5]->(10)-[2.5]->(6)
+(6)-[4.0]->(8)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)-[2.5]->(20)-[2.5]->(27)
+(27)-[1.0]->(33)-[2.0]->(37)
+
+----------Longest Path-----------
+
+Length         : 51
+Weight         : 104.0
+
+(0)-[2.0]->(2)-[1.0]->(4)-[1.0]->(1)-[3.5]->(7)-[1.5]->(9)-[1.5]->(13)
+(13)-[2.5]->(17)-[2.5]->(20)-[2.5]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)
+(14)-[3.5]->(12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)
+(17)-[2.5]->(13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)-[1.0]->(4)-[1.0]->(2)
+(2)-[2.0]->(3)-[1.0]->(5)-[2.5]->(10)-[2.5]->(6)-[4.0]->(8)-[1.5]->(12)
+(12)-[3.5]->(14)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)-[2.5]->(20)-[2.5]->(26)
+(26)-[3.0]->(32)-[1.0]->(27)-[1.0]->(33)-[2.0]->(34)-[1.0]->(29)-[1.0]->(24)
+(24)-[1.5]->(22)-[1.5]->(19)-[3.5]->(23)-[1.5]->(25)-[1.0]->(31)-[3.0]->(36)
+(36)-[1.0]->(30)-[1.0]->(35)-[2.0]->(37)    
+
+-------------------Distinct cycles---------------------
+    
+----------General Paths----------
+    
+Path count     : 3538
+Average length : 24.910
+Average weight : 54.987
+
+----------Shortest Path----------
+
+Length         : 3
+Weight         : 4.0
+
+(1)-[1.0]->(4)-[1.0]->(2)-[2.0]->(1)
+
+----------Longest Path-----------
+
+Length         : 39
+Weight         : 85.0
+
+(1)-[1.0]->(4)-[1.0]->(2)-[2.0]->(3)-[1.0]->(5)-[2.5]->(10)-[2.5]->(6)
+(6)-[4.0]->(8)-[1.5]->(12)-[3.5]->(14)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)
+(18)-[2.5]->(20)-[2.5]->(27)-[1.0]->(33)-[2.0]->(32)-[1.0]->(26)-[4.0]->(17)
+(17)-[2.5]->(13)-[3.0]->(7)-[1.5]->(1)-[2.0]->(2)-[1.0]->(4)-[2.0]->(9)
+(9)-[2.0]->(15)-[2.0]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)-[3.5]->(12)
+(12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)-[2.5]->(13)
+(13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)
+
+Time passed:  132.64 seconds
+
+This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [graphAnalysis](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
 
 ## License

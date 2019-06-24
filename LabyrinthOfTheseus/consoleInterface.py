@@ -6,11 +6,15 @@ Created on 06.06.2019
 
 import graphAnalysis
 from typing import Collection
-
+import time
 
 def main():
+    begin = time.time()
     display_labyrinth_graph_analysis()
+    end = time.time()
+    print(f'Time passed: {end - begin: .2f} seconds')
     exit()
+    
 
 
 def display_labyrinth_graph_analysis():
