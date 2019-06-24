@@ -118,13 +118,14 @@ class Path:
       pass
    
    copy(self) -> Path:
-   '''Returns a shallow copy of the path.'''
+   '''Returns a copy of the path with all attributes being a shallow copy.'''
       pass
       
       
 # Initialize the current_path parameter only containing the start-node
-# and all_paths as an empty collection
-GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths=[]: Collection[Path], ignore_nodes=0: int) -> Collection[Path]:
+# and all_paths as an empty collection.
+GetAllAcyclicPaths(current_path: Path, goal_node: int, 
+   all_paths=[]: Collection[Path], ignore_nodes=0: int) -> Collection[Path]:
 '''Returns a list of all acyclic paths leading from the given path to the goal-node.'''
    # If the path has not reached the goal yet
    if current_path.finish_node is not goal_node:
@@ -135,7 +136,7 @@ GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths=[]: Collection[
             # Recursively use method on the new path extended by the following edge
             new_path = current_path.copy()
             new_path.add_egde(edge)
-            paths.extend(GetAllAcyclicPaths(goal_node, new_path, all_paths)   
+            paths.extend(GetAllAcyclicPaths(new_path, goal_node, all_paths)   
    else:
       # If the path has reached the goal add it to the list of all acyclic paths
       all_paths.add(current_path)
@@ -145,10 +146,10 @@ GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths=[]: Collection[
 GetAllDistinctCycles(graph: Graph) -> Collection[Path]:
 '''Returns a list of all distinct cycles in the given graph.'''
    all_cycles = []: List[Path]
-   for i in range(0, graph.node_count):
+   # For all possible minimal start-nodes
+   for i in range(graph.node_count):   
       all_cycles.extend(GetAllAcyclicPaths(Path(i), i,  [], i)
-   return all_cycles
-   
+   return all_cycles 
 ```
 
 Shortest and longest paths are found via linear search, as well as other data for example the arithmetic average of the length of all distinct cycles. This leads among other things to the following result, the longest acyclic path:
