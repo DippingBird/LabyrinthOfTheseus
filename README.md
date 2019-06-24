@@ -238,4 +238,4 @@ This task takes approximate 2 minutes on my Intel i5-7200U processor running Win
 
 ## License
 
-MIT License
+This project is licensed under the terms of the MIT license.
