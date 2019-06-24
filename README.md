@@ -91,6 +91,7 @@ class Edge:
    target_node: int
    weight: float
 
+
 class Graph:
 '''A directed, weighted multigraph.'''
    # Nodes are indexed from 0 to node_count-1 incremental
@@ -129,7 +130,7 @@ class Path:
    '''Adds the edge to the path if it is a following edge.'''
       pass
    
-   copy(self) -> Path:
+   copy(self):
    '''Returns a copy of the path with all attributes being a shallow copy.'''
       pass
       
@@ -172,13 +173,14 @@ Image using the transformed work of Heinrich Hemme
 
 ## Usage
 
-By running the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) the graph is analysed and the results should returned as a console log similar as follows:
+By running the module [`consoleInterface`](/LabyrinthOfTheseus/consoleInterface.py) the graph is analysed and the results should returned as a console log similar as follows:
 
 ```
 Building graph ...
 Done!
 Analysing graph ...
 Done!
+Time passed:  132.64 seconds
 
 ----------Labyrinth of Theseus graph analysis----------
 
@@ -245,11 +247,9 @@ Weight         : 85.0
 (9)-[2.0]->(15)-[2.0]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)-[3.5]->(12)
 (12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)-[2.5]->(13)
 (13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)
-
-Time passed:  132.64 seconds
 ```
 
-This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [graphAnalysis](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [consoleInterface](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
+This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [`graphAnalysis`](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [`consoleInterface`](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
 
 ## License
 
