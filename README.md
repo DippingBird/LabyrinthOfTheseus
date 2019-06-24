@@ -56,7 +56,7 @@ r          | right
 The edges are written in an ascending order, according to the following order-relation:
 
 ```python
-IsLesserThan(edge1, edge2):
+is_lesser_than(edge1, edge2):
 '''Returns wether edge1 is behind edge2 in an ascending order.'''
 
    # Smaller indexed nodes of both edges
@@ -123,8 +123,8 @@ class Path:
    following_edges: Collection[Edge]
    
    __init__(self, graph: Graph, start_node: int):
-      self.start_node = start_node
       self.graph = graph
+      self.start_node = start_node     
   
    add_edge(self, edge: Edge):
    '''Adds the edge to the path if it is a following edge.'''
