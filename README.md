@@ -3,11 +3,11 @@ A hobby project analysing a puzzle about the labyrinth of theseus invented by Da
 
 ---
 ## Table of Contents
-1. **Motivation**
-2. **Graph Generation**
-3. **Algorithms**
-4. **Usage**
-5. **License**
+1. [**Motivation**](#motivation)
+2. [**Graph Generation**](#graph-generation)
+3. [**Algorithms**](#algorithms)
+4. [**Usage**](#usage)
+5. [**License**](#license)
 ---
 ## Motivation
 The idea to create this project began with solving the current puzzle from the mathematical puzzle-column "[Mathematische Rätsel](https://www.spektrum.de/raetsel/)" titled "[Hemmes mathematische Rätsel: Das Labyrinth](https://www.spektrum.de/raetsel/das-labyrinth/1577642)" written by Heinrich Hemme and published online by the "[Spektrum der Wissenschaft Verlagsgesellschaft mbH](https://www.spektrumverlag.de/impressum/)" on the 25th October of 2018, a german version of the [Scientific American](https://www.scientificamerican.com/). Hemmes short summary of the puzzle translated into englisch:
