@@ -249,7 +249,7 @@ Weight         : 85.0
 (13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)
 ```
 
-This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [`graphAnalysis`](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [`consoleInterface`](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
+This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [`graphAnalysis`](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [`consoleInterface`](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99, and the weights are only displayed with one decimal of accuracy. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
 
 ## License
 
