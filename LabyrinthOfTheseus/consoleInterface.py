@@ -9,10 +9,7 @@ from typing import Collection
 import time
 
 def main():
-    begin = time.time()
     display_labyrinth_graph_analysis()
-    end = time.time()
-    print(f'Time passed: {end - begin: .2f} seconds')
     exit()
     
 
@@ -22,6 +19,7 @@ def display_labyrinth_graph_analysis():
     Displays the analysis of the Labyrinth of Theseus
     as a graph in the console.
     '''
+    begin = time.time()
     print('Building graph ...')
     graph = graphAnalysis.import_graph()
     print('Done!')
@@ -30,6 +28,8 @@ def display_labyrinth_graph_analysis():
     acyclic_paths = graphAnalysis.all_acyclic_paths(graph, 0, 37)
     cyclic_paths = graphAnalysis.all_distinct_cycles(graph)
     print('Done!')
+    end = time.time()
+    print(f'Time passed: {end - begin: .2f} seconds')
     print(f'''
 ----------Labyrinth of Theseus graph analysis----------
 
@@ -40,9 +40,9 @@ Edge count : {graph.edge_count()}
 {written_paths_analysis(acyclic_paths)}
 -------------------Distinct cycles---------------------
 {written_paths_analysis(cyclic_paths)}
-''')
-    
+''')    
 
+    
 def written_paths_analysis(paths: Collection[graphAnalysis.Path]) -> str:
     '''Returns a string containing analysis of the given paths.'''
     shortest_path = graphAnalysis.shortest_path(paths)
