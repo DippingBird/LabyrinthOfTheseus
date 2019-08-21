@@ -19,12 +19,12 @@ The idea to create this project began with solving the current puzzle from the m
 > the shortest path of this kind through the labyrinth? It should be assumed that 
 > Theseus always walks parallel or cross to the walls of the rooms.
 
-![Image of the labyrinth](/LabyrinthOfTheseus/resources/labyrinth.png)
+![Image of the labyrinth](/resources/images/labyrinth.png)
 All rights reserved to Heinrich Hemme
 
 Hemme showed that the shortest path Theseus could take is 30 units long assuming that a small quadratic room has a sidelength of 1 unit. He also mentioned that Markus Götz from Maihingen (who sadly passed away last year i was told by Hemme) analyzed the problem 1998 and found that there were a total of 624 acyclic paths for Theseus to take.
 
-![Image of shortest path in labyrinth](/LabyrinthOfTheseus/resources/shortestPath.png)
+![Image of shortest path in labyrinth](/resources/images/shortestPath.png)
 All rights reserved to Heinrich Hemme
 
 My approach was converting the labyrinth into a graph and applying [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) in order to find the shortest path. A few months passed until i wanted to learn how to program in [Python](https://en.wikipedia.org/wiki/Python_(programming_language)) after learning C# and Java. I figured writing a program analysing this puzzle as a graph would be a good first challenge, hopefully finding the same amount of acyclic paths that Markus found.
@@ -37,14 +37,14 @@ However each node has two states, for nodes connecting horizontal adjacent rooms
 
 Since the puzzle is only concerned with paths from the start to the finish one can simplify the graph by deleting nodes which have only outgoing-or-ingoing edge, resulting in the folowing graph.
 
-![Image of the labyrinth graph](/LabyrinthOfTheseus/resources/graph.png)
+![Image of the labyrinth graph](/resources/images/graph.png)
 Image using the transformed work of Heinrich Hemme
 
 The nodes are arbitrary indexed in a raster-fashion from the bottom upwards and left-to-right. One can easily see that this simplification does not alter the amount of paths between the start-and-goal nodes nor the amount of cycles in the graph, since no choice is made when entering or leaving such nodes.
 
 The last step is converting the presented graph into a proper directed weighted graph, which i did by assigning nodes that are entered from the left or bottom and left from the right or top the index shown in the graph, otherwise the index added with 38, assuring that all nodes are distinct and indexed consecutive.
 
-The edges of the shown undirected graph are given to a program as a typed in [csv-file](/LabyrinthOfTheseus/resources/labyrinthEdges.csv). The directions specify where the edge is leading relative to the node, being shortened as follows:
+The edges of the shown undirected graph are given to a program as a typed in [csv-file](/resources/labyrinthEdges.csv). The directions specify where the edge is leading relative to the node, being shortened as follows:
 
 Identifier | Direction
 -----------|----------
@@ -168,12 +168,12 @@ GetAllDistinctCycles(graph: Graph):
 
 Shortest and longest paths are found via linear search, as well as other data for example the arithmetic average of the length of all distinct cycles. This leads among other things to the following result, the longest acyclic path:
 
-![Longest path](/LabyrinthOfTheseus/resources/longestPath.png)
+![Longest path](/resources/images/longestPath.png)
 Image using the transformed work of Heinrich Hemme
 
 ## Usage
 
-By running the module [`consoleInterface`](/LabyrinthOfTheseus/consoleInterface.py) the graph is analysed and the results should returned as a console log similar as follows:
+By running the module [`consoleInterface`](/consoleInterface.py) the graph is analysed and the results should returned as a console log similar as follows:
 
 ```
 Building graph ...
@@ -249,7 +249,7 @@ Weight         : 85.0
 (13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)
 ```
 
-This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [`graphAnalysis`](/LabyrinthOfTheseus/graphAnalysis.py) should work with any arbitrary graph. However the module [`consoleInterface`](/LabyrinthOfTheseus/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99, and the weights are only displayed with one decimal of accuracy. Also the nodes are displayed modulu 38 so they fit the [graph](/LabyrinthOfTheseus/resources/graph.png) shown before.
+This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [`graphAnalysis`](graphAnalysis.py) should work with any arbitrary graph. However the module [`consoleInterface`](/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99, and the weights are only displayed with one decimal of accuracy. Also the nodes are displayed modulu 38 so they fit the [graph](/resources/images/graph.png) shown before.
 
 ## License
 
