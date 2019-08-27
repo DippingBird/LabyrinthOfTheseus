@@ -20,29 +20,30 @@ The idea to create this project began with solving the current puzzle from the m
 > Theseus always walks parallel or cross to the walls of the rooms.
 
 ![Image of the labyrinth](/resources/images/labyrinth.png)
-All rights reserved to Heinrich Hemme
+<sup>All rights reserved to Heinrich Hemme</sup>
 
 Hemme showed that the shortest path Theseus could take is 30 units long assuming that a small quadratic room has a sidelength of 1 unit. He also mentioned that Markus Götz from Maihingen (who sadly passed away last year i was told by Hemme) analyzed the problem 1998 and found that there were a total of 624 acyclic paths for Theseus to take.
 
 ![Image of shortest path in labyrinth](/resources/images/shortestPath.png)
-All rights reserved to Heinrich Hemme
+<sup>All rights reserved to Heinrich Hemme</sup>
 
 My approach was converting the labyrinth into a graph and applying [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) in order to find the shortest path. A few months passed until i wanted to learn how to program in [Python](https://en.wikipedia.org/wiki/Python_(programming_language)) after learning C# and Java. I figured writing a program analysing this puzzle as a graph would be a good first challenge, hopefully finding the same amount of acyclic paths that Markus found.
 
-However i found quite the opposite, that there were 8256 acyclic paths, more than 13-times the amount that Markus found! After a lot of pondering and double-checking i believe my awnser is the correct one, however i cannot be absolutely sure, a third person solving the problem through programing would certainly help deciding which the correct awnser is.
+However i found quite the opposite, that there were 8256 acyclic paths, which was later confirmed by a friend of Hemme, the mathematician Helmut Postl residing in Vienna, Austria.
+
 ## Graph Generation
-In order to convert the labyrinth into a graph i placed nodes into each transit from one romm in another, as well from the start in the first room and from the last room to the goal. Edges are added between nodes respecting the rule of always turning right or left, and the weight being the length assuming the same units as Hemme. This placement of the nodes has the advantage of treating every romm equally, meaning that the edges are similar for similar rooms.
+In order to convert the labyrinth into a graph i placed nodes into each transit from one room in another, as well from the start in the first room and from the last room to the goal. Edges are added between nodes respecting the rule of always turning right or left, and the weight being the length assuming the same units as Hemme. This placement of the nodes has the advantage of treating every romm equally, meaning that the edges are similar for similar rooms.
 
 However each node has two states, for nodes connecting horizontal adjacent rooms entering from the left or right, and for vertical adjacent rooms entering from up or down. Thus each node actually represents two nodes in an ordinary directed weighted graph, but since these two nodes are highly symmetrical they can often just be treated as one.
 
 Since the puzzle is only concerned with paths from the start to the finish one can simplify the graph by deleting nodes which have only outgoing-or-ingoing edge, resulting in the folowing graph.
 
 ![Image of the labyrinth graph](/resources/images/graph.png)
-Image using the transformed work of Heinrich Hemme
+<sup>Image using the transformed work of Heinrich Hemme</sup>
 
 The nodes are arbitrary indexed in a raster-fashion from the bottom upwards and left-to-right. One can easily see that this simplification does not alter the amount of paths between the start-and-goal nodes nor the amount of cycles in the graph, since no choice is made when entering or leaving such nodes.
 
-The last step is converting the presented graph into a proper directed weighted graph, which i did by assigning nodes that are entered from the left or bottom and left from the right or top the index shown in the graph, otherwise the index added with 38, assuring that all nodes are distinct and indexed consecutive.
+The last step is converting the presented graph into a proper directed weighted graph, which i did by adding to nodes that are entered from the left or bottom and left from the right or top the letter **a**, otherwise **b**.
 
 The edges of the shown undirected graph are given to a program as a typed in [csv-file](/resources/labyrinthEdges.csv). The directions specify where the edge is leading relative to the node, being shortened as follows:
 
@@ -56,131 +57,59 @@ r          | right
 The edges are written in an ascending order, according to the following order-relation:
 
 ```python
-is_lesser_than(edge1, edge2):
-'''Returns wether edge1 is behind edge2 in an ascending order.'''
+is_lesser_than(edge_1, edge_2):
+'''Returns wether edge_1 is behind edge_2 in an ascending order.'''
 
    # Smaller indexed nodes of both edges
-   minnode1 = min(edge1.node1, edge1.node2)
-   minnode2 = min(edge2.node1, edge2.node2)
+   minnode_1 = min(edge_1.node_1, edge_1.node_2)
+   minnode_2 = min(edge_2.node_1, edge_2.node_2)
    # Greater indexed nodes of both edges
-   maxnode1 = max(edge1.node1, edge1.node2)
-   maxnode2 = max(edge2.node1, edge2.node2)
+   maxnode_1 = max(edge_1.node_1, edge_1.node_2)
+   maxnode_2 = max(edge_2.node_1, edge_2.node_2)
    
    # Compare by the smaller indexed nodes
-   if minnode1 < minnode2:
+   if minnode_1 < minnode_2:
       return True
    # then the greater ones
-   elif minnode1 == minnode2 and maxnode1 < maxnode2:
+   elif minnode_1 == minnode_2 and maxnode_1 < maxnode_2:
       return True
    else:
       # finally compare by weight
-      return maxnode1 == maxnode2 and ede1.weight < edge2.weight
+      return maxnode_1 == maxnode_2 and edge_1.weight < edge_2.weight
 ```
 
-By default node1 is allready the smaller and node2 the bigger indexed node.
+By default `node_1` is allready the smaller and `node_2` the bigger indexed node.
+
 ## Algorithms
-The project implements two main  algorithms for analysing the graph. One returning the set of all acyclic paths from a given start-node to a given goal-node, and another returning the set of all distinct cycles. A cycle is called distinct in this context if it does not contain another cycle and its start-node is unique, which is archieved by always choosing the smallest indexed node as the start-node (in the following example it is the maximal indexed node).
+The project implements two main  algorithms for analysing the graph. One returning the set of all acyclic paths from a given start-node to a given goal-node, and another returning the set of all distinct cycles. 
+A cycle is called distinct in this context if it does not contain another cycle and its unique no matter which node is chosen as the starting node.
 
-Since the graph can have multiple edges bewtween two nodes it is a so called multigraph, and this prevents the implementation of a weight-function with the source-and-target-node as inputs. A simplified but logical identical Python-Code is shown as follows, in the actual project these algorithms are implemented  as iterative not recursive ones to increase efficiency. One can further increase efficiency by using Hash-Sets to implement Path.visited_nodes, in order to check for containement in O(1) instead of O(n). One could also when finding all distinct cycles simply delete the edges and nodes that are not needed anymore to avoid uneccesary edge-checking, however this was not done in this project because it increases the complexity of the graph-class, the "deleted" nodes are simply ignored. A full implementation of the Graph, Edge or Path class is not given.
+The algorithm for finding all acyclic paths simply visits the succeeding nodes from the current paths (starting with one path
+only containing the starting-node) and creates a new, extended path to each visited node. 
+If the visited node is the goal-node, it is added to the list of all acyclic paths. If not, and no cycle is created, i.e. the node has not been visited before, it is added to the next iteration as starting path, otherwise it is ignored. After that the current paths are also ignored, and the iteration starts again with the remaining extended paths.
+This procedure repeats until no paths are added to the next iteration, i.e. all extended paths reach their goal or cause
+a cycle to occur.
 
+The algorithm for finding all distict cyclic paths uses the previous algorithm by choosing a random node from the graph and collecting all acyclic paths from this node to its preceeding nodes. After that the paths are extended by their edge to the node and added to the list of all distinct cycles. 
+Then the node is deleted from the graph, including all entering and outgoing edges, and a random node is picked from the remaining set and the procedure is repeated, until no nodes remain.
 
-```python
-class Edge:
-'''A directed, weighted edge.''' 
-   source_node: int
-   target_node: int
-   weight: float
-
-
-class Graph:
-'''A directed, weighted multigraph.'''
-   # Nodes are indexed from 0 to node_count-1 incremental
-   node_count: int
-   
-   delete_maximal_node(self):
-      '''
-      Deletes the highest indexed node from the graph as well as 
-      all in-and-outleading edges.
-      '''
-      pass
-      
-   copy(self):
-      '''Returns a copy of the path with all attributes being a shallow copy.'''
-      pass
-
-
-class Path:
-'''A directed, weighted path'''
-   # The graph in which the path is contained
-   graph: Graph
-   # The node in the graph where the path starts
-   start_node: int
-   # The node in the graph where the path ends
-   finish_node: int
-   # Set of all nodes which are visited on the path
-   visited_nodes: Collection[int]
-   # Set of all outgoing edges from the finish-node
-   following_edges: Collection[Edge]
-   
-   __init__(self, graph: Graph, start_node: int):
-      self.graph = graph
-      self.start_node = start_node     
-  
-   add_edge(self, edge: Edge):
-   '''Adds the edge to the path if it is a following edge.'''
-      pass
-   
-   copy(self):
-   '''Returns a copy of the path with all attributes being a shallow copy.'''
-      pass
-      
-      
-# Initialize the current_path parameter only containing the start-node
-# and all_paths as an empty collection.
-GetAllAcyclicPaths(current_path: Path, goal_node: int, all_paths=[]: Collection[Path]):
-'''Returns a list of all acyclic paths leading from the given path to the goal-node.'''
-   # If the path has not reached the goal yet
-   if current_path.finish_node is not goal_node:
-      # For all edges continuing the path
-      for edge in path.following_edges:
-         # which dont cause cycles
-         if edge.target_node not in path.visited_nodes:
-            # Recursively use method on the new path extended by the following edge
-            new_path = current_path.copy()
-            new_path.add_egde(edge)
-            paths.extend(GetAllAcyclicPaths(new_path, goal_node, all_paths)   
-   else:
-      # If the path has reached the goal add it to the list of all acyclic paths
-      all_paths.add(current_path)
-   return all_paths
-
-
-GetAllDistinctCycles(graph: Graph):
-'''Returns a list of all distinct cycles in the given graph.'''
-   reduced_graph = graph.copy()
-   all_cycles = []: List[Path]
-   # For all possible maximal indexed start-nodes
-   for i in range(graph.node_count-1, -1, -1):
-      all_cycles.extend(GetAllAcyclicPaths(Path(reduced_graph, i), i))
-      reduced_graph.delete_maximal_node()
-   return all_cycles 
-```
+Since the graph can have multiple edges bewtween two nodes it is a so called multigraph, and this prevents the implementation of a weight-function with the source-and-target-node as inputs. For the second algorithm, a copy of the graph can be used if the graph should not be modified.
 
 Shortest and longest paths are found via linear search, as well as other data for example the arithmetic average of the length of all distinct cycles. This leads among other things to the following result, the longest acyclic path:
 
 ![Longest path](/resources/images/longestPath.png)
-Image using the transformed work of Heinrich Hemme
+<sup>Image using the transformed work of Heinrich Hemme</sup>
 
 ## Usage
 
-By running the module [`consoleInterface`](/consoleInterface.py) the graph is analysed and the results should returned as a console log similar as follows:
+By running the module [`ConsoleInterface`](/ConsoleInterface.py) the graph is analysed and the results should returned as a console log similar as follows:
 
 ```
 Building graph ...
 Done!
 Analysing graph ...
 Done!
-Time passed:  132.64 seconds
+Time passed:  80.00 seconds
 
 ----------Labyrinth of Theseus graph analysis----------
 
@@ -188,7 +117,7 @@ Node count : 76
 Edge count : 166
 
 -----------Acyclic paths from entry to exit------------
-     
+    
 ----------General Paths----------
     
 Path count     : 8256
@@ -200,24 +129,25 @@ Average weight : 70.516
 Length         : 14
 Weight         : 30.0
 
-(0)-[2.0]->(2)-[1.0]->(4)-[2.0]->(9)-[2.0]->(15)-[2.5]->(10)-[2.5]->(6)
-(6)-[4.0]->(8)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)-[2.5]->(20)-[2.5]->(27)
-(27)-[1.0]->(33)-[2.0]->(37)
+(0a)-[2.0]->(2a)-[1.0]->(4b)-[2.0]->(9a)-[2.0]->(15a)-[2.5]->(10a)-[2.5]->(6a)
+(6a)-[4.0]->(8a)-[1.5]->(11b)-[2.5]->(16b)-[2.0]->(18b)-[2.5]->(20b)
+(20b)-[2.5]->(27a)-[1.0]->(33a)-[2.0]->(37a)
 
 ----------Longest Path-----------
 
 Length         : 51
 Weight         : 104.0
 
-(0)-[2.0]->(2)-[1.0]->(4)-[1.0]->(1)-[3.5]->(7)-[1.5]->(9)-[1.5]->(13)
-(13)-[2.5]->(17)-[2.5]->(20)-[2.5]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)
-(14)-[3.5]->(12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)
-(17)-[2.5]->(13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)-[1.0]->(4)-[1.0]->(2)
-(2)-[2.0]->(3)-[1.0]->(5)-[2.5]->(10)-[2.5]->(6)-[4.0]->(8)-[1.5]->(12)
-(12)-[3.5]->(14)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)-[2.5]->(20)-[2.5]->(26)
-(26)-[3.0]->(32)-[1.0]->(27)-[1.0]->(33)-[2.0]->(34)-[1.0]->(29)-[1.0]->(24)
-(24)-[1.5]->(22)-[1.5]->(19)-[3.5]->(23)-[1.5]->(25)-[1.0]->(31)-[3.0]->(36)
-(36)-[1.0]->(30)-[1.0]->(35)-[2.0]->(37)    
+(0a)-[2.0]->(2a)-[1.0]->(4b)-[1.0]->(1b)-[3.5]->(7a)-[1.5]->(9a)-[1.5]->(13b)
+(13b)-[2.5]->(17a)-[2.5]->(20a)-[2.5]->(18a)-[2.0]->(16a)-[2.5]->(11a)
+(11a)-[1.5]->(14a)-[3.5]->(12b)-[1.5]->(8b)-[4.0]->(6b)-[2.5]->(10b)
+(10b)-[2.5]->(15b)-[2.0]->(17b)-[2.5]->(13a)-[1.5]->(9b)-[1.5]->(7b)
+(7b)-[3.5]->(1a)-[1.0]->(4a)-[2.5]->(10a)-[2.5]->(5b)-[1.0]->(2b)-[2.0]->(3a)
+(3a)-[1.0]->(6a)-[4.0]->(8a)-[1.5]->(12a)-[3.5]->(14b)-[1.5]->(11b)
+(11b)-[2.5]->(16b)-[2.0]->(18b)-[2.5]->(20b)-[2.5]->(26b)-[3.0]->(32b)
+(32b)-[1.0]->(27a)-[1.0]->(33a)-[2.0]->(34b)-[1.0]->(29a)-[1.0]->(24b)
+(24b)-[1.5]->(22a)-[1.5]->(19b)-[3.5]->(23b)-[1.5]->(25a)-[1.0]->(31a)
+(31a)-[3.0]->(36b)-[1.0]->(30b)-[1.0]->(35a)-[2.0]->(37a)    
 
 -------------------Distinct cycles---------------------
     
@@ -227,29 +157,29 @@ Path count     : 3538
 Average length : 24.910
 Average weight : 54.987
 
-
 ----------Shortest Path----------
 
-Length         : 3
+Length         : 2
 Weight         : 4.0
 
-(1)-[1.0]->(4)-[1.0]->(2)-[2.0]->(1)
+(3b)-[3.0]->(6b)-[1.0]->(3b)
 
 ----------Longest Path-----------
- 
+
 Length         : 39
 Weight         : 85.0
 
-(1)-[1.0]->(4)-[1.0]->(2)-[2.0]->(3)-[1.0]->(5)-[2.5]->(10)-[2.5]->(6)
-(6)-[4.0]->(8)-[1.5]->(12)-[3.5]->(14)-[1.5]->(11)-[2.5]->(16)-[2.0]->(18)
-(18)-[2.5]->(20)-[2.5]->(27)-[1.0]->(33)-[2.0]->(32)-[1.0]->(26)-[4.0]->(17)
-(17)-[2.5]->(13)-[3.0]->(7)-[1.5]->(1)-[2.0]->(2)-[1.0]->(4)-[2.0]->(9)
-(9)-[2.0]->(15)-[2.0]->(18)-[2.0]->(16)-[2.5]->(11)-[1.5]->(14)-[3.5]->(12)
-(12)-[1.5]->(8)-[4.0]->(6)-[2.5]->(10)-[2.5]->(15)-[2.0]->(17)-[2.5]->(13)
-(13)-[1.5]->(9)-[1.5]->(7)-[3.5]->(1)
+(12a)-[3.5]->(14b)-[1.5]->(11b)-[2.5]->(16b)-[2.0]->(18b)-[2.0]->(15b)
+(15b)-[2.0]->(9b)-[2.0]->(4a)-[1.0]->(2b)-[2.0]->(1a)-[1.5]->(7b)-[3.0]->(13a)
+(13a)-[2.5]->(17b)-[4.0]->(26a)-[1.0]->(32a)-[2.0]->(33b)-[1.0]->(27b)
+(27b)-[2.5]->(20a)-[2.5]->(18a)-[2.0]->(16a)-[2.5]->(11a)-[1.5]->(14a)
+(14a)-[3.5]->(12b)-[1.5]->(8b)-[4.0]->(6b)-[2.5]->(10b)-[2.5]->(5a)-[1.0]->(3b)
+(3b)-[2.0]->(2a)-[1.0]->(4b)-[1.0]->(1b)-[3.5]->(7a)-[1.5]->(9a)-[1.5]->(13b)
+(13b)-[2.5]->(17a)-[2.0]->(15a)-[2.5]->(10a)-[2.5]->(6a)-[4.0]->(8a)
+(8a)-[1.5]->(12a)
 ```
 
-This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [`graphAnalysis`](graphAnalysis.py) should work with any arbitrary graph. However the module [`consoleInterface`](/consoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 77, assuming that the nodes are never indexed above 99, and the weights are only displayed with one decimal of accuracy. Also the nodes are displayed modulu 38 so they fit the [graph](/resources/images/graph.png) shown before.
+This task takes approximate 2 minutes on my Intel i5-7200U processor running Windows 10 and CPython. All the algorithms in the module [`GraphAnalysis`](/GraphAnalysis.py) should work with any arbitrary graph. However the module [`ConsoleInterface`](/ConsoleInterface.py) has some settings specific to the example, that being the check for minimal line length in line 84, assuming that the nodes never have an identifier-length greater than 3, and the weights are only displayed with one decimal of accuracy.
 
 ## License
 
