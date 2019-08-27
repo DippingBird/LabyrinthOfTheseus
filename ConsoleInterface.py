@@ -7,7 +7,7 @@ Created on 24.06.2019
 in the console.
 '''
 
-import graphAnalysis
+import GraphAnalysis
 from typing import Collection
 import time
 
@@ -24,12 +24,12 @@ def display_labyrinth_graph_analysis():
     '''
     begin = time.time()
     print('Building graph ...')
-    graph = graphAnalysis.import_graph()
+    graph = GraphAnalysis.import_graph()
     print('Done!')
     # All acyclic paths from the entry to the exit of the labyrinth
     print('Analysing graph ...')
-    acyclic_paths = graphAnalysis.all_acyclic_paths(graph, '0a', '37a')
-    cyclic_paths = graphAnalysis.all_distinct_cycles(graph)
+    acyclic_paths = GraphAnalysis.all_acyclic_paths(graph, '0a', '37a')
+    cyclic_paths = GraphAnalysis.all_distinct_cycles(graph)
     print('Done!')
     end = time.time()
     print(f'Time passed: {end - begin: .2f} seconds')
@@ -46,16 +46,16 @@ Edge count : {graph.edge_count()}
 ''')    
 
     
-def written_paths_analysis(paths: Collection[graphAnalysis.Path]) -> str:
+def written_paths_analysis(paths: Collection[GraphAnalysis.Path]) -> str:
     '''Returns a string containing analysis of the given paths.'''
-    shortest_path = graphAnalysis.shortest_path(paths)
-    longest_path = graphAnalysis.longest_path(paths)
+    shortest_path = GraphAnalysis.shortest_path(paths)
+    longest_path = GraphAnalysis.longest_path(paths)
     written_paths_analysis = f'''    
 ----------General Paths----------
     
 Path count     : {len(paths)}
-Average length : {graphAnalysis.average_length(paths):.3f}
-Average weight : {graphAnalysis.average_total_weight(paths):.3f}
+Average length : {GraphAnalysis.average_length(paths):.3f}
+Average weight : {GraphAnalysis.average_total_weight(paths):.3f}
 
 ----------Shortest Path----------
 
@@ -74,7 +74,7 @@ Weight         : {longest_path.total_weight:.1f}
     return written_paths_analysis
 
 
-def written_path(path: graphAnalysis.Path, max_line_length: int=80) -> str:
+def written_path(path: GraphAnalysis.Path, max_line_length: int=80) -> str:
     '''
     Returns a string showing the visited nodes of the given path in order
     with the corresponding edge-weights.

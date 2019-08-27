@@ -232,6 +232,13 @@ def longest_path(paths: Iterable[Path]) -> Path:
 
 
 def all_distinct_cycles(graph: Graph) -> List[Path]:
+    '''
+    Returns all distinct cycles in the graph
+    
+    Every returned cycle only contains one cycle total,
+    and is unique no matter which starting-node in the
+    cycle is chosen.
+    '''
     graph_copy = graph.copy()
     all_distinct_cycles = []
     for node in graph.nodes:
