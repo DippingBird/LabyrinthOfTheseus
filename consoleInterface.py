@@ -28,7 +28,7 @@ def display_labyrinth_graph_analysis():
     print('Done!')
     # All acyclic paths from the entry to the exit of the labyrinth
     print('Analysing graph ...')
-    acyclic_paths = graphAnalysis.all_acyclic_paths(graph, 0, 37)
+    acyclic_paths = graphAnalysis.all_acyclic_paths(graph, '0a', '37a')
     cyclic_paths = graphAnalysis.all_distinct_cycles(graph)
     print('Done!')
     end = time.time()
@@ -36,7 +36,7 @@ def display_labyrinth_graph_analysis():
     print(f'''
 ----------Labyrinth of Theseus graph analysis----------
 
-Node count : {graph.node_count}
+Node count : {graph.node_count()}
 Edge count : {graph.edge_count()}
 
 -----------Acyclic paths from entry to exit------------
@@ -81,18 +81,18 @@ def written_path(path: graphAnalysis.Path, max_line_length: int=80) -> str:
     '''
     # Make sure that at least two nodes with on edge
     # fit in one line.
-    if(max_line_length <= 16):
+    if(max_line_length <= 18):
         raise ValueError('Given maximal line-length is to short')
     char_count = 0
-    written_path = f'({path.start_node%38})'
-    for edge in path.edges:
-        next_node = f'-[{edge.weight:.1f}]->({edge.target_node%38})'
+    written_path = f'({path.start_node})'
+    for edge in path.crossed_edges:
+        next_node = f'-[{edge.weight:.1f}]->({edge.target_node})'
         # If the current line is longer than the given line-length,
         # cut it off
         if(max_line_length <= (len(written_path)-char_count)+len(next_node)):
             # Account for line-break character
             char_count = len(written_path) + 1
-            written_path += f'\n({edge.source_node%38})'
+            written_path += f'\n({edge.source_node})'
         written_path += next_node
     return written_path
 
